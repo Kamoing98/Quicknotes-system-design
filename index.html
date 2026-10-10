@@ -1,13 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QuickNotes - System Design</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuickNotes - System Design</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="api.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📝 QuickNotes</h1>
+      <p>A simple note-taking app with API integration</p>
+    </header>
+
+    <!-- Status message area -->
+    <p id="status"></p>
+
+    <!-- Load notes button -->
+    <div class="actions">
+      <button id="load-btn" class="btn btn-primary">⬇ Load Notes</button>
+    </div>
+
+    <!-- Note creation form -->
+    <form id="note-form" class="form-card">
+      <h2>➕ Create a New Note</h2>
+
+      <div class="form-group">
+        <label for="title-input">Title *</label>
+        <input
+          id="title-input"
+          type="text"
+          placeholder="Enter note title (max 100 characters)"
+          maxlength="100"
+        />
+        <p id="title-error" class="form-error"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="body-input">Body (optional)</label>
+        <textarea
+          id="body-input"
+          placeholder="Enter note content..."
+        ></textarea>
+      </div>
+
+      <button id="submit-btn" type="submit" class="btn btn-primary">
+        ✈ Create Note
+      </button>
+    </form>
+
+    <!-- Notes list -->
+    <div class="notes-section">
+      <h2 id="notes-heading">📋 Notes</h2>
+      <ul id="notes-list"></ul>
+    </div>
+
+    <!-- Documentation links -->
+    <div class="docs-nav">
+      <h2>📚 System Design Documents</h2>
+      <ul>
+        <li>
+          <a href="docs/api-design.md" target="_blank" rel="noopener noreferrer">
+            📡 API Design Document
+          </a>
+          — REST endpoints, request/response examples, error codes
+        </li>
+        <li>
+          <a href="docs/data-model.md" target="_blank" rel="noopener noreferrer">
+            🗄️ Data Model Document
+          </a>
+          — Entity relationships, SQL schema, queries, indexes
+        </li>
+        <li>
+          <a href="docs/architecture.md" target="_blank" rel="noopener noreferrer">
+            🏗️ Architecture Document
+          </a>
+          — System design, load estimates, component diagram, trade-offs
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
 </html>
