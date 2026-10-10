@@ -1,62 +1,79 @@
 # QuickNotes — System Design
 
-A full-stack system design project for QuickNotes, a note-taking application scaled to serve 1 million users. This repository demonstrates both a working API client (using JSONPlaceholder as a practice API) and comprehensive design documents for the backend team.
+A full-stack system design project for QuickNotes, a note-taking application scaled to serve 1 million users. This repository includes a working API client (using JSONPlaceholder as a practice API) and comprehensive design documents for the backend team.
 
 ## Description
 
-QuickNotes is a note-taking web application that allows users to create, read, update, and delete notes with tag support. This project consists of two parts:
+QuickNotes is a note-taking web application that allows users to create, read, update, and delete notes. This project consists of two parts:
 
-1. **API Client** — A front-end application that communicates with a REST API to load, create, and delete notes. Uses the JSONPlaceholder API for demonstration purposes.
+1. **API Client** — A vanilla HTML/CSS/JavaScript application that communicates with a REST API to load, create, and delete notes. Uses the JSONPlaceholder API for demonstration.
 2. **System Design Documents** — Three detailed documents that the backend team will use to build the production API, database schema, and infrastructure.
 
 ## How to Run the API Client
 
-### Prerequisites
+### Option 1: Open directly in a browser
 
-- Node.js 18+ and npm
+Simply open `index.html` in a web browser. The app will load and you can interact with it immediately.
 
-### Steps
+### Option 2: Using a local server
+
+```bash
+# Using Python
+python3 -m http.server 8000
+
+# Using Node.js (if you have http-server installed)
+npx http-server
+
+# Using PHP
+php -S localhost:8000
+```
+
+Then visit `http://localhost:8000` in your browser.
+
+### Option 3: Build with Vite (for production)
 
 ```bash
 # Install dependencies
 npm install
 
-# Start the development server
-npm run dev
-
 # Build for production
 npm run build
+
+# The built files will be in the dist/ folder
 ```
 
-The application will open in your browser. Click "Load Notes" to fetch 10 notes from the JSONPlaceholder API. Use the form to create new notes, and click "Delete" on any note to remove it.
+### Files
+
+- `index.html` — HTML5 page with the form, notes list, and status area
+- `api.js` — JavaScript API client with GET, POST, and DELETE operations
+- `style.css` — CSS styles with distinct success/error/loading/empty states
 
 ### Features
 
 - ✅ **GET** — Load 10 notes from the server
 - ✅ **POST** — Create a new note with validation (title required, max 100 characters)
 - ✅ **DELETE** — Remove a note from the list
-- ✅ Loading, success, error, and empty states
+- ✅ Loading, success, error, and empty states shown on the page
 - ✅ Buttons disabled during requests
 - ✅ Input validation with user-friendly error messages
-- ✅ User text safely rendered (no XSS)
+- ✅ User text inserted with `textContent` only (prevents XSS)
+- ✅ Reusable `request()` function with `response.ok` check
 
 ## Design Documents
 
 | Document | Description |
 |----------|-------------|
-| [📡 API Design](docs/api-design.md) | REST endpoints, request/response examples, error codes, authentication |
-| [🗄️ Data Model](docs/data-model.md) | Entity relationships, SQL schema, queries, indexes, SQL vs NoSQL justification |
-| [🏗️ Architecture](docs/architecture.md) | System diagram, load estimates, component explanations, request flows, trade-offs |
+| [📡 API Design](docs/api-design.md) | 12 REST endpoints, request/response JSON examples, error codes (400, 401, 403, 404, 500) |
+| [🗄️ Data Model](docs/data-model.md) | 4 entities, relationships, CREATE TABLE statements, 5 SQL queries (including JOIN), 3 indexes, SQL vs NoSQL justification |
+| [🏗️ Architecture](docs/architecture.md) | Functional/non-functional requirements, load estimates for 1M users, architecture diagram, component explanations, request flows, trade-offs, SPOF avoidance |
 
 ## Project Structure
 
 ```
 quicknotes-system-design/
 ├── index.html              # HTML5 skeleton with form and notes list
-├── src/
-│   ├── App.tsx             # Main application component (API client)
-│   ├── main.tsx            # React entry point
-│   └── index.css           # Styles with distinct success/error states
+├── api.js                  # API client (GET, POST, DELETE with error handling)
+├── style.css               # Styles with distinct success/error states
 ├── docs/
 │   ├── api-design.md       # REST API specification
 │   ├── data-model.md       # Database schema and queries
@@ -64,24 +81,31 @@ quicknotes-system-design/
 └── README.md               # This file
 ```
 
+## API Client Implementation Details
+
+### `api.js` Structure
+
+- **`API_URL`** — Constant set to `https://jsonplaceholder.typicode.com/posts`
+- **`request(url, options)`** — Reusable async function that calls `fetch`, checks `response.ok`, and throws on errors
+- **`loadNotes()`** — GET request to load 10 notes
+- **`createNote(title, body)`** — POST request to create a note
+- **`deleteNote(id)`** — DELETE request to remove a note
+- All functions wrapped in `try/catch/finally` blocks
+- Buttons disabled while requests are running
+- All user text inserted with `textContent` only (no `innerHTML`)
+
+### Important Note About JSONPlaceholder
+
+JSONPlaceholder does not persist data. DELETE requests return 200 but don't actually remove data on the server. The app handles this by optimistically removing notes from the local DOM state. POST requests return a new note with an `id`, but refreshing the page will reset to server data. This is documented in code comments.
+
 ## What I Learned
 
-1. **RESTful API design** — I learned how to design a complete REST API with proper HTTP methods, status codes, request/response formats, pagination, authentication, and error handling. Understanding the difference between 400, 401, 403, 404, and 500 errors and when to use each one was particularly valuable.
+1. **RESTful API design** — I learned how to design a complete REST API with proper HTTP methods (GET, POST, PUT, PATCH, DELETE), status codes (200, 201, 204, 400, 401, 403, 404, 500), request/response formats, pagination, authentication with JWT, and structured error handling with consistent error bodies.
 
-2. **Database modeling and SQL** — I learned how to model entities with proper relationships (one-to-many and many-to-many), write CREATE TABLE statements with foreign keys and constraints, design indexes for common query patterns, and justify the choice of SQL over NoSQL based on the application's needs.
+2. **Database modeling and SQL** — I learned how to model entities with proper relationships (one-to-many between users and notes, many-to-many between notes and tags via a junction table), write CREATE TABLE statements with foreign keys, ON DELETE CASCADE constraints, and UNIQUE constraints. I also learned to design composite indexes for common query patterns and justify the choice of SQL (PostgreSQL) over NoSQL based on the need for referential integrity, ACID transactions, and structured relationships.
 
-3. **System architecture at scale** — I learned how to estimate load (reads/writes per second, storage per year) for 1 million users, design an architecture with redundant components to avoid single points of failure, and make trade-off decisions (e.g., SQL vs NoSQL, synchronous vs event-driven, cache-aside vs write-through) with clear reasoning.
+3. **System architecture at scale** — I learned how to estimate load for 1 million users (calculating DAU, peak-hour traffic, reads/writes per second, and annual storage growth), design a multi-tier architecture with redundant components (load balancer, multiple app servers, Redis cache, primary database with read replica, message queue with workers), and make informed trade-off decisions (SQL vs NoSQL, synchronous vs event-driven, cache-aside vs write-through) with clear reasoning. I also learned how to avoid single points of failure at every layer.
 
-4. **Front-end API integration** — I learned how to properly handle async operations in the browser, including loading states, error handling, input validation, disabling buttons during requests, and safely rendering user-provided text to prevent XSS attacks.
+4. **Front-end API integration** — I learned how to properly handle async operations in vanilla JavaScript, including managing loading/success/error/empty states, disabling buttons during requests, validating user input before sending requests, and safely rendering user-provided text with `textContent` to prevent XSS attacks.
 
-5. **Technical documentation** — I learned how to write clear, structured technical documents that a backend team can use as a specification to build a system, including diagrams, examples, and justifications for design decisions.
-
-## API Client Notes
-
-- The app uses [JSONPlaceholder](https://jsonplaceholder.typicode.com) as a practice API.
-- **Important:** JSONPlaceholder does not persist data. DELETE requests return 200 but don't actually remove data on the server. The app handles this by optimistically removing notes from the local state.
-- POST requests return a new note with an `id`, but refreshing the page will reset to server data.
-
-## License
-
-This project was created as a system design exercise.
+5. **Technical documentation** — I learned how to write clear, structured technical documents that a backend team can use as a specification, including ASCII architecture diagrams, JSON request/response examples, SQL queries with explanations, and justifications for design decisions.

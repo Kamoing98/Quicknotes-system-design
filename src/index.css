@@ -1,17 +1,5 @@
-@import "tailwindcss";
-
-:root {
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-success: #16a34a;
-  --color-error: #dc2626;
-  --color-loading: #2563eb;
-  --color-bg: #f8fafc;
-  --color-card: #ffffff;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
-  --color-border: #e2e8f0;
-}
+/* Import styles from root style.css */
+@import "../style.css";
 
 * {
   box-sizing: border-box;
